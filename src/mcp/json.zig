@@ -141,6 +141,21 @@ pub fn getObjectField(parsed: std.json.Value, field: []const u8) ?std.json.Value
     return obj.get(field);
 }
 
+/// Address-style lookup: accepts a JSON string ("0x...", symbol, or
+/// expression) or a JSON integer, formatted as "0x{X}" into buf so the
+/// result can be handed to the debugger's expression parser.
+/// Returns null for negative integers and non-string/non-integer values.
+pub fn getAddrField(parsed: std.json.Value, field: []const u8, buf: []u8) ?[]const u8 {
+    if (parsed != .object) return null;
+    const obj = parsed.object;
+    const val = obj.get(field) orelse return null;
+    return switch (val) {
+        .string => |s| s,
+        .integer => |i| if (i < 0) null else std.fmt.bufPrint(buf, "0x{X}", .{i}) catch null,
+        else => null,
+    };
+}
+
 // ── Tests ───────────────────────────────────────────────────────────
 
 test "JsonWriter writes a simple object" {
@@ -271,4 +286,67 @@ test "getObjectField returns null for non-object root" {
     , .{});
     defer parsed.deinit();
     try std.testing.expect(getObjectField(parsed.value, "0") == null);
+}
+
+test "getAddrField passes string addresses through unchanged" {
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator,
+        \\{"address":"0x1400016B0"}
+    , .{});
+    defer parsed.deinit();
+    var buf: [32]u8 = undefined;
+    const val = getAddrField(parsed.value, "address", &buf);
+    try std.testing.expect(val != null);
+    try std.testing.expectEqualStrings("0x1400016B0", val.?);
+}
+
+test "getAddrField formats integer addresses as hex" {
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator,
+        \\{"address":5368714928}
+    , .{});
+    defer parsed.deinit();
+    var buf: [32]u8 = undefined;
+    const val = getAddrField(parsed.value, "address", &buf);
+    try std.testing.expect(val != null);
+    try std.testing.expectEqualStrings("0x1400016B0", val.?);
+}
+
+test "getAddrField formats zero as 0x0" {
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator,
+        \\{"address":0}
+    , .{});
+    defer parsed.deinit();
+    var buf: [32]u8 = undefined;
+    const val = getAddrField(parsed.value, "address", &buf);
+    try std.testing.expect(val != null);
+    try std.testing.expectEqualStrings("0x0", val.?);
+}
+
+test "getAddrField rejects negative integers and floats" {
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator,
+        \\{"neg":-1,"f":1.5}
+    , .{});
+    defer parsed.deinit();
+    var buf: [32]u8 = undefined;
+    try std.testing.expect(getAddrField(parsed.value, "neg", &buf) == null);
+    try std.testing.expect(getAddrField(parsed.value, "f", &buf) == null);
+}
+
+test "getAddrField rejects non-address types and missing fields" {
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator,
+        \\{"b":true,"arr":[1]}
+    , .{});
+    defer parsed.deinit();
+    var buf: [32]u8 = undefined;
+    try std.testing.expect(getAddrField(parsed.value, "b", &buf) == null);
+    try std.testing.expect(getAddrField(parsed.value, "arr", &buf) == null);
+    try std.testing.expect(getAddrField(parsed.value, "missing", &buf) == null);
+}
+
+test "getAddrField returns null when the buffer is too small" {
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator,
+        \\{"address":5368714928}
+    , .{});
+    defer parsed.deinit();
+    var buf: [4]u8 = undefined;
+    try std.testing.expect(getAddrField(parsed.value, "address", &buf) == null);
 }

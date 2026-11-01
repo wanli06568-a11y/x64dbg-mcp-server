@@ -710,7 +710,7 @@ fn schemaWaitForEvent(w: *JsonWriter) void {
 }
 
 fn schemaReadMemory(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Hex address or expression to read from.\"},\"size\":{\"type\":\"integer\",\"description\":\"Number of bytes to read (max 4096).\",\"default\":64}},\"required\":[\"address\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Hex address or expression to read from.\"},\"size\":{\"type\":\"integer\",\"description\":\"Number of bytes to read (max 4096).\",\"default\":64}},\"required\":[\"address\"]}");
 }
 
 fn schemaWaitForPause(w: *JsonWriter) void {
@@ -722,23 +722,23 @@ fn schemaRunTarget(w: *JsonWriter) void {
 }
 
 fn schemaSetBreakpoint(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"target\":{\"type\":\"string\",\"description\":\"Hex address or API symbol to break on.\"}},\"required\":[\"target\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"target\":{\"type\":[\"string\",\"integer\"],\"description\":\"Hex address or API symbol to break on.\"}},\"required\":[\"target\"]}");
 }
 
 fn schemaDeleteBreakpoint(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"target\":{\"type\":\"string\",\"description\":\"Hex address or API symbol of the breakpoint to remove.\"}},\"required\":[\"target\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"target\":{\"type\":[\"string\",\"integer\"],\"description\":\"Hex address or API symbol of the breakpoint to remove.\"}},\"required\":[\"target\"]}");
 }
 
 fn schemaWriteMemToAddress(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Hex address to write to.\"},\"byteString\":{\"type\":\"string\",\"description\":\"Hex bytes to write, e.g. '0F FF 90'.\"}},\"required\":[\"address\",\"byteString\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Hex address to write to.\"},\"byteString\":{\"type\":\"string\",\"description\":\"Hex bytes to write, e.g. '0F FF 90'.\"}},\"required\":[\"address\",\"byteString\"]}");
 }
 
 fn schemaCommentOrLabel(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Hex address.\"},\"value\":{\"type\":\"string\",\"description\":\"The comment or label text.\"},\"mode\":{\"type\":\"string\",\"description\":\"'Comment' or 'Label'.\",\"default\":\"Comment\"}},\"required\":[\"address\",\"value\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Hex address.\"},\"value\":{\"type\":\"string\",\"description\":\"The comment or label text.\"},\"mode\":{\"type\":\"string\",\"description\":\"'Comment' or 'Label'.\",\"default\":\"Comment\"}},\"required\":[\"address\",\"value\"]}");
 }
 
 fn schemaDisassemble(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Address or expression (default: current IP).\",\"default\":\"cip\"},\"count\":{\"type\":\"integer\",\"description\":\"Number of instructions (default 10, max 100).\",\"default\":10}},\"required\":[]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Address or expression (default: current IP).\",\"default\":\"cip\"},\"count\":{\"type\":\"integer\",\"description\":\"Number of instructions (default 10, clamped to [1, 100]).\",\"default\":10}},\"required\":[]}");
 }
 
 fn schemaEvalExpression(w: *JsonWriter) void {
@@ -758,7 +758,7 @@ fn schemaAttachProcess(w: *JsonWriter) void {
 }
 
 fn schemaAssemble(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Address to assemble at.\"},\"instruction\":{\"type\":\"string\",\"description\":\"Assembly instruction (e.g. nop, mov eax 1, jmp 0x401000).\"}},\"required\":[\"address\",\"instruction\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Address to assemble at.\"},\"instruction\":{\"type\":\"string\",\"description\":\"Assembly instruction (e.g. nop, mov eax 1, jmp 0x401000).\"}},\"required\":[\"address\",\"instruction\"]}");
 }
 
 fn schemaModuleName(w: *JsonWriter) void {
@@ -766,11 +766,11 @@ fn schemaModuleName(w: *JsonWriter) void {
 }
 
 fn schemaSetHardwareBreakpoint(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Address for the hardware breakpoint.\"},\"type\":{\"type\":\"string\",\"description\":\"Type: r (read), w (write), x (execute, default).\",\"default\":\"x\"},\"size\":{\"type\":\"integer\",\"description\":\"Size: 1, 2, 4, or 8 (default 1).\",\"default\":1}},\"required\":[\"address\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Address for the hardware breakpoint.\"},\"type\":{\"type\":\"string\",\"description\":\"Type: r (read), w (write), x (execute, default).\",\"default\":\"x\"},\"size\":{\"type\":\"integer\",\"description\":\"Size: 1, 2, 4, or 8 (default 1).\",\"default\":1}},\"required\":[\"address\"]}");
 }
 
 fn schemaSetMemoryBreakpoint(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Address for the memory breakpoint.\"},\"type\":{\"type\":\"string\",\"description\":\"Type: r (read/access), w (write), x (execute). Default: access (any).\"},\"singleshoot\":{\"type\":\"boolean\",\"description\":\"If true, breakpoint is removed after first hit (default false).\",\"default\":false}},\"required\":[\"address\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Address for the memory breakpoint.\"},\"type\":{\"type\":\"string\",\"description\":\"Type: r (read/access), w (write), x (execute). Default: access (any).\"},\"singleshoot\":{\"type\":\"boolean\",\"description\":\"If true, breakpoint is removed after first hit (default false).\",\"default\":false}},\"required\":[\"address\"]}");
 }
 
 fn schemaFindPattern(w: *JsonWriter) void {
@@ -782,11 +782,11 @@ fn schemaGetStrings(w: *JsonWriter) void {
 }
 
 fn schemaGetReferences(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Target address to find references to.\"},\"module\":{\"type\":\"string\",\"description\":\"Module to search in (default: main exe).\"}},\"required\":[\"address\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Target address to find references to.\"},\"module\":{\"type\":\"string\",\"description\":\"Module to search in (default: main exe).\"}},\"required\":[\"address\"]}");
 }
 
 fn schemaRunToAddress(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Address to run to.\"},\"timeoutMs\":{\"type\":\"integer\",\"description\":\"Timeout ms (default 30000).\",\"default\":30000}},\"required\":[\"address\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Address to run to.\"},\"timeoutMs\":{\"type\":\"integer\",\"description\":\"Timeout ms (default 30000).\",\"default\":30000}},\"required\":[\"address\"]}");
 }
 
 fn schemaTraceInto(w: *JsonWriter) void {
@@ -794,11 +794,11 @@ fn schemaTraceInto(w: *JsonWriter) void {
 }
 
 fn schemaSetConditionalBreakpoint(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Breakpoint address.\"},\"condition\":{\"type\":\"string\",\"description\":\"Break condition expression, e.g. 'eax==0'.\"},\"log\":{\"type\":\"string\",\"description\":\"Log format string (optional).\"}},\"required\":[\"address\",\"condition\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Breakpoint address.\"},\"condition\":{\"type\":\"string\",\"description\":\"Break condition expression, e.g. 'eax==0'.\"},\"log\":{\"type\":\"string\",\"description\":\"Log format string (optional).\"}},\"required\":[\"address\",\"condition\"]}");
 }
 
 fn schemaFollowPointer(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Starting address or expression.\"},\"depth\":{\"type\":\"integer\",\"description\":\"Dereference depth (default 1, max 16).\",\"default\":1}},\"required\":[\"address\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Starting address or expression.\"},\"depth\":{\"type\":\"integer\",\"description\":\"Dereference depth (default 1, max 16).\",\"default\":1}},\"required\":[\"address\"]}");
 }
 
 fn schemaWatchExpressions(w: *JsonWriter) void {
@@ -810,11 +810,11 @@ fn schemaGetArguments(w: *JsonWriter) void {
 }
 
 fn schemaDumpMemory(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Start address.\"},\"size\":{\"type\":\"integer\",\"description\":\"Bytes to dump.\"},\"filePath\":{\"type\":\"string\",\"description\":\"Output file path on disk.\"}},\"required\":[\"address\",\"size\",\"filePath\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Start address.\"},\"size\":{\"type\":\"integer\",\"description\":\"Bytes to dump.\"},\"filePath\":{\"type\":\"string\",\"description\":\"Output file path on disk.\"}},\"required\":[\"address\",\"size\",\"filePath\"]}");
 }
 
 fn schemaTargetAddr(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Target address or expression.\"}},\"required\":[\"address\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Target address or expression.\"}},\"required\":[\"address\"]}");
 }
 
 fn schemaAllocateMemory(w: *JsonWriter) void {
@@ -822,7 +822,7 @@ fn schemaAllocateMemory(w: *JsonWriter) void {
 }
 
 fn schemaFreeMemory(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Base address of the allocated block to free.\"}},\"required\":[\"address\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Base address of the allocated block to free.\"}},\"required\":[\"address\"]}");
 }
 
 fn schemaSearchSymbols(w: *JsonWriter) void {
@@ -850,15 +850,15 @@ fn schemaExceptionCode(w: *JsonWriter) void {
 }
 
 fn schemaAnalyzeCode(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Address or module to analyze. If omitted, analyzes the current module.\"},\"type\":{\"type\":\"string\",\"description\":\"Analysis type: 'function' (analr - analyze single function), 'module' (anal - analyze module), 'controlflow' (cfanal - control flow analysis). Default: module.\",\"default\":\"module\"}},\"required\":[]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Address or module to analyze. If omitted, analyzes the current module.\"},\"type\":{\"type\":\"string\",\"description\":\"Analysis type: 'function' (analr - analyze single function), 'module' (anal - analyze module), 'controlflow' (cfanal - control flow analysis). Default: module.\",\"default\":\"module\"}},\"required\":[]}");
 }
 
 fn schemaSetBreakpointCommand(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Breakpoint address.\"},\"command\":{\"type\":\"string\",\"description\":\"x64dbg command to run on hit (e.g. 'log {x:eax}', 'msg {utf8@[esp+4]}').\"}},\"required\":[\"address\",\"command\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Breakpoint address.\"},\"command\":{\"type\":\"string\",\"description\":\"x64dbg command to run on hit (e.g. 'log {x:eax}', 'msg {utf8@[esp+4]}').\"}},\"required\":[\"address\",\"command\"]}");
 }
 
 fn schemaBreakpointAddrBool(w: *JsonWriter) void {
-    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":\"string\",\"description\":\"Breakpoint address.\"},\"enable\":{\"type\":\"boolean\",\"description\":\"true to enable fast resume, false to disable.\",\"default\":true}},\"required\":[\"address\"]}");
+    w.raw("{\"type\":\"object\",\"properties\":{\"address\":{\"type\":[\"string\",\"integer\"],\"description\":\"Breakpoint address.\"},\"enable\":{\"type\":\"boolean\",\"description\":\"true to enable fast resume, false to disable.\",\"default\":true}},\"required\":[\"address\"]}");
 }
 
 // ── Tool implementations ────────────────────────────────────────────
@@ -866,6 +866,13 @@ fn schemaBreakpointAddrBool(w: *JsonWriter) void {
 fn getParamStr(params: ?std.json.Value, field: []const u8) ?[]const u8 {
     const p = params orelse return null;
     return json.getStringField(p, field);
+}
+
+/// Address-style params accept both a JSON string ("0x...", symbol, or
+/// expression) and a JSON integer, which is formatted as "0x{X}" into buf.
+fn getParamAddr(params: ?std.json.Value, field: []const u8, buf: []u8) ?[]const u8 {
+    const p = params orelse return null;
+    return json.getAddrField(p, field, buf);
 }
 
 fn getParamInt(params: ?std.json.Value, field: []const u8) ?i64 {
@@ -1192,7 +1199,8 @@ fn readMemory(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
     if (bridge.isRunning()) return errResult(out, "Error: Target is running. Pause first.");
 
-    const addr_str = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     var size: usize = 64;
     if (getParamInt(params, "size")) |s| {
@@ -1487,7 +1495,8 @@ fn restartDebug(_: ?std.json.Value, out: []u8) ToolResult {
 
 // ── SetBreakpoint ───────────────────────────────────────────────────
 fn setBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
-    const target = getParamStr(params, "target") orelse
+    var target_buf: [32]u8 = undefined;
+    const target = getParamAddr(params, "target", &target_buf) orelse
         return errResult(out, "Error: target is required.");
     var cmd_buf: [512]u8 = undefined;
     const cmd = std.fmt.bufPrint(&cmd_buf, "bp {s}\x00", .{target}) catch
@@ -1498,7 +1507,8 @@ fn setBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
 
 // ── DeleteBreakpoint ────────────────────────────────────────────────
 fn deleteBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
-    const target = getParamStr(params, "target") orelse
+    var target_buf: [32]u8 = undefined;
+    const target = getParamAddr(params, "target", &target_buf) orelse
         return errResult(out, "Error: target is required.");
     var cmd_buf: [512]u8 = undefined;
     const cmd = std.fmt.bufPrint(&cmd_buf, "bc {s}\x00", .{target}) catch
@@ -1590,7 +1600,8 @@ fn writeMemToAddress(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
     if (bridge.isRunning()) return errResult(out, "Error: Target is running. Pause first.");
 
-    const addr_str = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     const byte_str = getParamStr(params, "byteString") orelse
         return errResult(out, "Error: byteString is required.");
@@ -1624,7 +1635,8 @@ fn writeMemToAddress(params: ?std.json.Value, out: []u8) ToolResult {
 fn commentOrLabelAtAddress(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
 
-    const addr_str = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     const value = getParamStr(params, "value") orelse
         return errResult(out, "Error: value is required.");
@@ -1654,7 +1666,8 @@ fn disassemble(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
     if (bridge.isRunning()) return errResult(out, "Error: Target is running. Pause first.");
 
-    const addr_str = getParamStr(params, "address") orelse "cip";
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse "cip";
     var count: usize = 10;
     if (getParamInt(params, "count")) |c| {
         count = @intCast(@min(@max(c, 1), 100));
@@ -1920,7 +1933,8 @@ fn attachProcess(params: ?std.json.Value, out: []u8) ToolResult {
 fn assemble(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
     if (bridge.isRunning()) return errResult(out, "Error: Target is running. Pause first.");
-    const addr_str = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     const instr = getParamStr(params, "instruction") orelse
         return errResult(out, "Error: instruction is required.");
@@ -2055,7 +2069,8 @@ fn getExports(params: ?std.json.Value, out: []u8) ToolResult {
 // ── SetHardwareBreakpoint ──────────────────────────────────────────
 fn setHardwareBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr_str = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     const bp_type = getParamStr(params, "type") orelse "x";
     const size = getParamInt(params, "size") orelse 1;
@@ -2069,7 +2084,8 @@ fn setHardwareBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
 // ── SetMemoryBreakpoint ────────────────────────────────────────────
 fn setMemoryBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr_str = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     const bp_type = getParamStr(params, "type") orelse "";
     const singleshoot = getParamBool(params, "singleshoot") orelse false;
@@ -2312,7 +2328,8 @@ fn getStrings(params: ?std.json.Value, out: []u8) ToolResult {
 fn getReferences(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
     if (bridge.isRunning()) return errResult(out, "Error: Target is running. Pause first.");
-    const addr_str = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     const target = resolveAddr(addr_str);
     if (target == 0) return fmtErr(out, "Error: Could not resolve '{s}'.", .{addr_str});
@@ -2517,7 +2534,8 @@ fn getFunctions(params: ?std.json.Value, out: []u8) ToolResult {
 // ── RunToAddress ──────────────────────────────────────────────────
 fn runToAddress(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr_str = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
 
     var cmd_buf: [512]u8 = undefined;
@@ -2588,7 +2606,8 @@ fn traceInto(params: ?std.json.Value, out: []u8) ToolResult {
 // ── SetConditionalBreakpoint ──────────────────────────────────────
 fn setConditionalBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr_str = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     const condition = getParamStr(params, "condition") orelse
         return errResult(out, "Error: condition is required.");
@@ -2617,7 +2636,8 @@ fn setConditionalBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
 fn followPointer(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
     if (bridge.isRunning()) return errResult(out, "Error: Target is running. Pause first.");
-    const addr_str = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     var addr = resolveAddr(addr_str);
     if (addr == 0) return fmtErr(out, "Error: Could not resolve '{s}'.", .{addr_str});
@@ -2879,7 +2899,8 @@ fn getArguments(params: ?std.json.Value, out: []u8) ToolResult {
 fn dumpMemory(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
     if (bridge.isRunning()) return errResult(out, "Error: Target is running. Pause first.");
-    const addr_str = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     const size = getParamInt(params, "size") orelse
         return errResult(out, "Error: size is required.");
@@ -2913,7 +2934,8 @@ fn allocateMemory(params: ?std.json.Value, out: []u8) ToolResult {
 // ── FreeMemory ────────────────────────────────────────────────────
 fn freeMemory(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr_str = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     var cmd_buf: [128]u8 = undefined;
     const cmd = std.fmt.bufPrint(&cmd_buf, "free {s}\x00", .{addr_str}) catch
@@ -2925,7 +2947,8 @@ fn freeMemory(params: ?std.json.Value, out: []u8) ToolResult {
 // ── EnableBreakpoint ──────────────────────────────────────────────
 fn enableBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     var cmd_buf: [128]u8 = undefined;
     const cmd = std.fmt.bufPrint(&cmd_buf, "bpe {s}\x00", .{addr}) catch
@@ -2937,7 +2960,8 @@ fn enableBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
 // ── DisableBreakpoint ─────────────────────────────────────────────
 fn disableBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     var cmd_buf: [128]u8 = undefined;
     const cmd = std.fmt.bufPrint(&cmd_buf, "bpd {s}\x00", .{addr}) catch
@@ -2949,7 +2973,8 @@ fn disableBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
 // ── ToggleBreakpoint ──────────────────────────────────────────────
 fn toggleBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     var cmd_buf: [128]u8 = undefined;
     const cmd = std.fmt.bufPrint(&cmd_buf, "bp {s}, toggle\x00", .{addr}) catch
@@ -2970,7 +2995,8 @@ fn deleteAllBreakpoints(_: ?std.json.Value, out: []u8) ToolResult {
 // ── ResetHitCount ─────────────────────────────────────────────────
 fn resetHitCount(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     var cmd_buf: [128]u8 = undefined;
     const cmd = std.fmt.bufPrint(&cmd_buf, "ResetBreakpointHitCount {s}\x00", .{addr}) catch
@@ -2983,7 +3009,8 @@ fn resetHitCount(params: ?std.json.Value, out: []u8) ToolResult {
 fn disassembleFunction(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
     if (bridge.isRunning()) return errResult(out, "Error: Target is running. Pause first.");
-    const addr_str = getParamStr(params, "address") orelse "cip";
+    var addr_buf: [32]u8 = undefined;
+    const addr_str = getParamAddr(params, "address", &addr_buf) orelse "cip";
 
     var start_buf: [64]u8 = undefined;
     const start_expr = std.fmt.bufPrint(&start_buf, "func.start({s})\x00", .{addr_str}) catch
@@ -3213,7 +3240,8 @@ fn resumeThread(params: ?std.json.Value, out: []u8) ToolResult {
 // ── SetBookmark ───────────────────────────────────────────────────
 fn setBookmark(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     var cmd_buf: [128]u8 = undefined;
     const cmd = std.fmt.bufPrint(&cmd_buf, "bookmarkadd {s}\x00", .{addr}) catch
@@ -3225,7 +3253,8 @@ fn setBookmark(params: ?std.json.Value, out: []u8) ToolResult {
 // ── DeleteBookmark ────────────────────────────────────────────────
 fn deleteBookmark(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     var cmd_buf: [128]u8 = undefined;
     const cmd = std.fmt.bufPrint(&cmd_buf, "bookmarkdel {s}\x00", .{addr}) catch
@@ -3538,7 +3567,8 @@ fn deleteExceptionBreakpoint(params: ?std.json.Value, out: []u8) ToolResult {
 // ── AnalyzeCode ──────────────────────────────────────────────────
 fn analyzeCode(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr = getParamStr(params, "address") orelse "";
+    var addr_buf: [32]u8 = undefined;
+    const addr = getParamAddr(params, "address", &addr_buf) orelse "";
     const atype = getParamStr(params, "type") orelse "module";
 
     var cmd_buf: [256]u8 = undefined;
@@ -3598,7 +3628,8 @@ fn traceOver(params: ?std.json.Value, out: []u8) ToolResult {
 // ── SetBreakpointCommand ─────────────────────────────────────────
 fn setBreakpointCommand(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     const command = getParamStr(params, "command") orelse
         return errResult(out, "Error: command is required.");
@@ -3612,7 +3643,8 @@ fn setBreakpointCommand(params: ?std.json.Value, out: []u8) ToolResult {
 // ── SetBreakpointFastResume ──────────────────────────────────────
 fn setBreakpointFastResume(params: ?std.json.Value, out: []u8) ToolResult {
     if (!bridge.isDebugging()) return errResult(out, "Error: No active debug session.");
-    const addr = getParamStr(params, "address") orelse
+    var addr_buf: [32]u8 = undefined;
+    const addr = getParamAddr(params, "address", &addr_buf) orelse
         return errResult(out, "Error: address is required.");
     const enable = getParamBool(params, "enable") orelse true;
     var cmd_buf: [256]u8 = undefined;
