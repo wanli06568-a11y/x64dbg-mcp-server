@@ -12,7 +12,7 @@ const INVALID_SOCKET = ws2.INVALID_SOCKET;
 
 const PROTOCOL_VERSION = "2024-11-05";
 const SERVER_NAME = "x64dbg-MCP Server";
-pub const SERVER_VERSION = "1.6";
+pub const SERVER_VERSION = "1.9";
 
 // Win32 threading
 const HANDLE = ?*anyopaque;
@@ -194,12 +194,23 @@ pub fn notifyEvent(level: []const u8, msg: []const u8) void {
     const pend_msg = std.fmt.bufPrint(&pend_buf, "[event:{s}] {s}", .{ level, msg }) catch msg;
     pendingPush(pend_msg);
 
-    // Push to SSE clients as JSON-RPC notification
+    // Push to SSE clients as JSON-RPC notification. Build it through JsonWriter
+    // so quotes, backslashes and control bytes in msg are escaped. The previous
+    // hand-rolled format string pasted msg straight into the JSON body, so any
+    // message containing a quote would have produced invalid JSON.
     var buf: [1024]u8 = undefined;
-    const json = std.fmt.bufPrint(&buf,
-        "{{\"jsonrpc\":\"2.0\",\"method\":\"notifications/message\",\"params\":{{\"level\":\"{s}\",\"data\":\"{s}\"}}}}",
-        .{ level, msg },
-    ) catch return;
+    var w = JsonWriter.init(&buf);
+    w.beginObject();
+    w.fieldStr("jsonrpc", "2.0");
+    w.fieldStr("method", "notifications/message");
+    w.key("params");
+    w.beginObject();
+    w.fieldStr("level", level);
+    w.fieldStr("data", msg);
+    w.endObject();
+    w.endObject();
+    if (w.overflow) return;
+    const json = w.slice();
     for (0..MAX_SSE_CLIENTS) |i| {
         if (sse_clients[i] != INVALID_SOCKET) {
             sseSendEvent(sse_clients[i], "message", json);
@@ -565,6 +576,10 @@ fn handleToolsCall(sock: SOCKET, id: ?std.json.Value, root: std.json.Value) void
     var buf: [131072]u8 = undefined;
     var w = JsonWriter.init(&buf);
     buildToolsCallResult(&w, root);
+    if (w.overflow) {
+        sendJsonRpcError(sock, id, -32603, "Result too large — response buffer overflow");
+        return;
+    }
     const result_str = w.slice();
     if (std.mem.startsWith(u8, result_str, "{\"error\":")) {
         sendJsonRpcError(sock, id, -32602, result_str);

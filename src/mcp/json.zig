@@ -7,13 +7,17 @@ const std = @import("std");
 pub const JsonWriter = struct {
     buf: []u8,
     pos: usize = 0,
+    overflow: bool = false,
 
     pub fn init(buf: []u8) JsonWriter {
-        return .{ .buf = buf, .pos = 0 };
+        return .{ .buf = buf, .pos = 0, .overflow = false };
     }
 
     pub fn raw(self: *JsonWriter, s: []const u8) void {
-        if (self.pos + s.len > self.buf.len) return;
+        if (self.pos + s.len > self.buf.len) {
+            self.overflow = true;
+            return;
+        }
         @memcpy(self.buf[self.pos..][0..s.len], s);
         self.pos += s.len;
     }
@@ -78,6 +82,15 @@ pub const JsonWriter = struct {
                 '\n' => self.raw("\\n"),
                 '\r' => self.raw("\\r"),
                 '\t' => self.raw("\\t"),
+                // RFC 8259 requires U+0000..U+001F to be escaped. Tool output
+                // (Echo, symbol/comment text, debugger strings) can carry them
+                // verbatim; emitting the raw byte produces JSON that strict
+                // parsers reject with "Bad control character".
+                0x00...0x08, 0x0B, 0x0C, 0x0E...0x1F => {
+                    var esc: [6]u8 = undefined;
+                    const hex = std.fmt.bufPrint(&esc, "\\u{x:0>4}", .{c}) catch return;
+                    self.raw(hex);
+                },
                 else => {
                     if (self.pos < self.buf.len) {
                         self.buf[self.pos] = c;
@@ -174,6 +187,29 @@ test "JsonWriter escapes special characters in strings" {
     var w = JsonWriter.init(&buf);
     w.writeString("a\"b\\c\nd\re\tf");
     try std.testing.expectEqualStrings("\"a\\\"b\\\\c\\nd\\re\\tf\"", w.slice());
+}
+
+test "JsonWriter escapes remaining control characters as \\u00XX" {
+    var buf: [256]u8 = undefined;
+    var w = JsonWriter.init(&buf);
+    // SOH, backspace, form feed, unit separator — each illegal unescaped.
+    w.writeString("a\x01b\x08c\x0cd\x1fe");
+    try std.testing.expectEqualStrings(
+        "\"a\\u0001b\\u0008c\\u000cd\\u001fe\"",
+        w.slice(),
+    );
+}
+
+test "JsonWriter control-character output parses as JSON" {
+    var buf: [256]u8 = undefined;
+    var w = JsonWriter.init(&buf);
+    w.beginObject();
+    w.fieldStr("text", "x\x01y\x08z");
+    w.endObject();
+
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, w.slice(), .{});
+    defer parsed.deinit();
+    try std.testing.expectEqualStrings("x\x01y\x08z", parsed.value.object.get("text").?.string);
 }
 
 test "JsonWriter writes null and raw fields" {
